@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +12,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final ApiService apiService = ApiService();
+
+  Future<void> onSubmitPress() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        String email = emailController.text;
+        String password = passwordController.text;
+
+        Map<String, dynamic> payload = {
+          'email': email,
+          'password': password,
+        };
+
+        var responseValue = await apiService.postData('auth/login', payload);
+
+        print('Login response ==>> $responseValue');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${responseValue['message']}')));
+      } catch (error) {
+        print('Error $error');
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please fill all inputs")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Please fill all inputs")));
-                      }
+                      onSubmitPress();
                     },
                     style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(Colors.blue)),
