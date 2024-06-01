@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:notesjot_app/src/screens/home_screen.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +15,15 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final ApiService apiService = ApiService();
+  FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+  Future<void> saveToLocal(String key, String value) async {
+    await secureStorage.write(key: key, value: value);
+  }
+
+  Future<String> getFromLocal(String key) async {
+    return await secureStorage.read(key: key) ?? "";
+  }
 
   Future<void> onSubmitPress() async {
     if (_formKey.currentState!.validate()) {
@@ -27,10 +38,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
         var responseValue = await apiService.postData('auth/login', payload);
 
-        print('Login response ==>> $responseValue');
+        String token = responseValue['data']['token'];
+
+        await saveToLocal("token", token);
 
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('${responseValue['message']}')));
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const HomeScreen();
+            },
+          ),
+          (route) => false,
+        );
       } catch (error) {
         print('Error $error');
         ScaffoldMessenger.of(context)
@@ -46,12 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.blue,
           title: const Center(
               child: Text(
-            'Login',
-            style: TextStyle(color: Colors.white),
-          ))),
+        'Login',
+        style: TextStyle(color: Colors.white),
+      ))),
       body: Form(
         key: _formKey,
         child: Padding(
