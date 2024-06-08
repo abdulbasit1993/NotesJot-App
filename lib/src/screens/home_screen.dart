@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/services/storage_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,6 +9,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  void initState() {
+    getToken();
+  }
+
+  void getToken() async {
+    var tokenValue = await StorageService().getFromLocal('token');
+
+    print('Token (HomeScreen) : $tokenValue');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

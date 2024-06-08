@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:notesjot_app/src/screens/home_screen.dart';
+import 'package:notesjot_app/src/services/storage_service.dart';
+import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,14 +15,16 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final ApiService apiService = ApiService();
-  FlutterSecureStorage secureStorage = FlutterSecureStorage();
+  bool isPasswordHidden = true;
 
-  Future<void> saveToLocal(String key, String value) async {
-    await secureStorage.write(key: key, value: value);
+  void initState() {
+    isPasswordHidden = true;
   }
 
-  Future<String> getFromLocal(String key) async {
-    return await secureStorage.read(key: key) ?? "";
+  void toggleShowPassword() {
+    setState(() {
+      isPasswordHidden = !isPasswordHidden;
+    });
   }
 
   Future<void> onSubmitPress() async {
@@ -38,22 +40,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
         var responseValue = await apiService.postData('auth/login', payload);
 
-        String token = responseValue['data']['token'];
+        dynamic responseSuccess = responseValue['success'];
 
-        await saveToLocal("token", token);
+        if (responseValue != null && responseSuccess == true) {
+          String token = responseValue['data']['token'];
 
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${responseValue['message']}')));
+          await StorageService().saveToLocal("token", token);
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const HomeScreen();
-            },
-          ),
-          (route) => false,
-        );
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${responseValue['message']}')));
+
+          Navigator.of(context).pushReplacementNamed(homeRoute);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${responseValue['message']}')));
+        }
       } catch (error) {
         print('Error $error');
         ScaffoldMessenger.of(context)
@@ -121,9 +122,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                 child: TextFormField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: isPasswordHidden,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: "Password"),
+                      border: OutlineInputBorder(),
+                      labelText: "Password",
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          toggleShowPassword();
+                        },
+                        icon: Icon(!isPasswordHidden
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                      )),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Please enter your password";
