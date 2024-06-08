@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
+import 'package:notesjot_app/src/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,14 +10,31 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> userNotesData = [];
+
   void initState() {
+    print('userNotesData ==>> $userNotesData');
     getToken();
   }
 
   void getToken() async {
     var tokenValue = await StorageService().getFromLocal('token');
 
-    print('Token (HomeScreen) : $tokenValue');
+    getNotesData(tokenValue);
+  }
+
+  void getNotesData(token) async {
+    dynamic notesData =
+        await ApiService().fetchData('notes/getAll', token: token);
+
+    bool successStatus = notesData['success'];
+
+    if (successStatus == true) {
+      List<dynamic> finalData = notesData['data'];
+      setState(() {
+        userNotesData = finalData;
+      });
+    }
   }
 
   @override
@@ -28,6 +46,16 @@ class _HomeScreenState extends State<HomeScreen> {
         'Home',
         style: TextStyle(color: Colors.white),
       ))),
+      body: ListView.builder(
+        itemCount: userNotesData.length,
+        itemBuilder: (context, index) {
+          final item = userNotesData[index];
+
+          return ListTile(
+            title: Text(item['title']),
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: const Icon(Icons.add),

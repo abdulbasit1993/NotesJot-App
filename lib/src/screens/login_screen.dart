@@ -150,7 +150,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onSubmitPress();
                     },
                     style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Colors.blue)),
+                        backgroundColor:
+                            WidgetStateProperty.all(Color(0xff597cff))),
                     child: const Text(
                       'Submit',
                       style: TextStyle(color: Colors.white),
