@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/models/notes_model.dart';
+import 'package:notesjot_app/src/screens/create_note_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
@@ -57,7 +59,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const CreateNoteScreen()));
+        },
         child: const Icon(Icons.add),
       ),
     );

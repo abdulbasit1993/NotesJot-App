@@ -29,41 +29,21 @@ class Note {
 }
 
 class Datum {
-  String id;
   String title;
   String content;
-  String createdBy;
-  DateTime createdAt;
-  DateTime updatedAt;
-  int v;
 
   Datum({
-    required this.id,
     required this.title,
     required this.content,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["_id"],
         title: json["title"],
         content: json["content"],
-        createdBy: json["createdBy"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
       );
 
   Map<String, dynamic> toJson() => {
-        "_id": id,
         "title": title,
         "content": content,
-        "createdBy": createdBy,
-        "createdAt": createdAt.toIso8601String(),
-        "updatedAt": updatedAt.toIso8601String(),
-        "__v": v,
       };
 }

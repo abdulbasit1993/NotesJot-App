@@ -77,6 +77,10 @@ class _LoginScreenState extends State<LoginScreen> {
             .showSnackBar(SnackBar(content: Text('$error')));
       }
     } else {
+      setState(() {
+        isLoading = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please fill all inputs")));
     }
