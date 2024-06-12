@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/models/notes_model.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
@@ -10,30 +11,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic> userNotesData = [];
+  Future<List<Datum>> notesFuture = getNotesData();
 
   void initState() {
-    print('userNotesData ==>> $userNotesData');
-    getToken();
+    getNotesData();
   }
 
-  void getToken() async {
+  static Future<List<Datum>> getNotesData() async {
     var tokenValue = await StorageService().getFromLocal('token');
 
-    getNotesData(tokenValue);
-  }
+    Map<String, dynamic> notesData =
+        await ApiService().fetchData('notes/getAll', token: tokenValue);
 
-  void getNotesData(token) async {
-    dynamic notesData =
-        await ApiService().fetchData('notes/getAll', token: token);
+    Note note = Note.fromJson(notesData);
 
-    bool successStatus = notesData['success'];
-
-    if (successStatus == true) {
-      List<dynamic> finalData = notesData['data'];
-      setState(() {
-        userNotesData = finalData;
-      });
+    if (note.success) {
+      return note.data;
+    } else {
+      throw Exception(note.message);
     }
   }
 
@@ -46,15 +41,20 @@ class _HomeScreenState extends State<HomeScreen> {
         'Home',
         style: TextStyle(color: Colors.white),
       ))),
-      body: ListView.builder(
-        itemCount: userNotesData.length,
-        itemBuilder: (context, index) {
-          final item = userNotesData[index];
-
-          return ListTile(
-            title: Text(item['title']),
-          );
-        },
+      body: Center(
+        child: FutureBuilder<List<Datum>>(
+          future: notesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasData) {
+              final notes = snapshot.data;
+              return buildNotes(notes);
+            } else {
+              return const Text('No Data Available');
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
@@ -62,4 +62,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+Widget buildNotes(List<Datum>? notes) {
+  return ListView.builder(
+    itemCount: notes?.length,
+    itemBuilder: (context, index) {
+      final note = notes?[index];
+      return ListTile(
+        title: Text(note!.title),
+        subtitle: Text(note!.content),
+      );
+    },
+  );
 }

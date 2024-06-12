@@ -16,9 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   final ApiService apiService = ApiService();
   bool isPasswordHidden = true;
+  bool isLoading = false;
 
   void initState() {
     isPasswordHidden = true;
+    isLoading = false;
   }
 
   void toggleShowPassword() {
@@ -28,6 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> onSubmitPress() async {
+    setState(() {
+      isLoading = true;
+    });
+
     if (_formKey.currentState!.validate()) {
       try {
         String email = emailController.text;
@@ -43,6 +49,10 @@ class _LoginScreenState extends State<LoginScreen> {
         dynamic responseSuccess = responseValue['success'];
 
         if (responseValue != null && responseSuccess == true) {
+          setState(() {
+            isLoading = false;
+          });
+
           String token = responseValue['data']['token'];
 
           await StorageService().saveToLocal("token", token);
@@ -52,11 +62,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
           Navigator.of(context).pushReplacementNamed(homeRoute);
         } else {
+          setState(() {
+            isLoading = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('${responseValue['message']}')));
         }
       } catch (error) {
         print('Error $error');
+        setState(() {
+          isLoading = false;
+        });
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('$error')));
       }
@@ -152,10 +168,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ButtonStyle(
                         backgroundColor:
                             WidgetStateProperty.all(Color(0xff597cff))),
-                    child: const Text(
-                      'Submit',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Submit',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               )
