@@ -34,6 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _handleRefresh() async {
+    setState(() {
+      Future<List<Datum>> notesFuture = getNotesData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +57,19 @@ class _HomeScreenState extends State<HomeScreen> {
               return const CircularProgressIndicator();
             } else if (snapshot.hasData) {
               final notes = snapshot.data;
-              return buildNotes(notes);
+              return RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: ListView.builder(
+                  itemCount: notes?.length,
+                  itemBuilder: (context, index) {
+                    final note = notes?[index];
+                    return ListTile(
+                      title: Text(note!.title),
+                      subtitle: Text(note!.content),
+                    );
+                  },
+                ),
+              );
             } else {
               return const Text('No Data Available');
             }
@@ -61,25 +79,17 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const CreateNoteScreen()));
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreateNoteScreen()))
+              .then((value) {
+            setState(() {
+              getNotesData();
+            });
+          });
         },
         child: const Icon(Icons.add),
       ),
     );
   }
-}
-
-Widget buildNotes(List<Datum>? notes) {
-  return ListView.builder(
-    itemCount: notes?.length,
-    itemBuilder: (context, index) {
-      final note = notes?[index];
-      return ListTile(
-        title: Text(note!.title),
-        subtitle: Text(note!.content),
-      );
-    },
-  );
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/models/notes_model.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
@@ -17,23 +18,66 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   final ApiService apiService = ApiService();
+  bool isLoading = false;
+
+  void initState() {
+    isLoading = false;
+  }
 
   Future<void> onSubmitPress() async {
-    if (_formKey.currentState!.validate()) {
-      var tokenValue = await StorageService().getFromLocal('token');
+    setState(() {
+      isLoading = true;
+    });
 
-      var title = titleController.text;
-      var content = contentController.text;
+    try {
+      if (_formKey.currentState!.validate()) {
+        var tokenValue = await StorageService().getFromLocal('token');
 
-      Map<String, dynamic> payload = {"title": title, "content": content};
+        String title = titleController.text;
+        String content = contentController.text;
 
-      var responseData =
-          await apiService.postData('notes/add', payload, token: tokenValue);
+        Map<String, dynamic> payload = {"title": title, "content": content};
 
-      print('response data add note ==>> $responseData');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please fill all inputs")));
+        final responseData =
+            await apiService.postData('notes/add', payload, token: tokenValue);
+
+        print('response data add note ==>> $responseData');
+
+        final responseSuccess = responseData['success'];
+
+        if (responseSuccess == true && responseData != null) {
+          setState(() {
+            isLoading = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${responseData['message']}')));
+
+          Navigator.pop(context);
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${responseData['message']}')));
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please fill all inputs")));
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      print('Error $e');
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 
@@ -102,10 +146,18 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                     style: ButtonStyle(
                         backgroundColor:
                             WidgetStateProperty.all(Color(0xff597cff))),
-                    child: const Text(
-                      'Submit',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            'Submit',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               )
