@@ -4,6 +4,7 @@ import 'package:notesjot_app/src/models/notes_model.dart';
 import 'package:notesjot_app/src/screens/create_note_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _handleRefresh() async {
     setState(() {
-      Future<List<Datum>> notesFuture = getNotesData();
+      notesFuture = getNotesData();
     });
   }
 
@@ -49,12 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'Home',
         style: TextStyle(color: Colors.white),
       ))),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         child: FutureBuilder<List<Datum>>(
           future: notesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
               final notes = snapshot.data;
               return RefreshIndicator(
@@ -63,9 +65,50 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: notes?.length,
                   itemBuilder: (context, index) {
                     final note = notes?[index];
-                    return ListTile(
-                      title: Text(note!.title),
-                      subtitle: Text(note!.content),
+                    final DateFormat formatter =
+                        DateFormat('MMM d, y - h:mm a');
+                    final formattedDate = formatter.format(note!.createdAt);
+                    return InkWell(
+                      onTap: () {
+                        print('tapped item: $note');
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 100,
+                        margin:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              spreadRadius: 0,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                note!.title,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(note!.content,
+                                  style: TextStyle(fontSize: 14)),
+                            ],
+                          ),
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -88,7 +131,11 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           });
         },
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        backgroundColor: Color(0xff597cff),
       ),
     );
   }

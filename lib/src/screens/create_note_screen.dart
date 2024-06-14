@@ -54,6 +54,8 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
               SnackBar(content: Text('${responseData['message']}')));
 
           Navigator.pop(context);
+
+          Navigator.pushReplacementNamed(context, homeRoute);
         } else {
           setState(() {
             isLoading = false;
