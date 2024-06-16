@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/models/notes_model.dart';
+import 'package:notesjot_app/src/screens/home_screen.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 
@@ -19,6 +19,13 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   TextEditingController contentController = TextEditingController();
   final ApiService apiService = ApiService();
   bool isLoading = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    contentController.dispose();
+  }
 
   void initState() {
     isLoading = false;
@@ -55,7 +62,10 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
 
           Navigator.pop(context);
 
-          Navigator.pushReplacementNamed(context, homeRoute);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => const HomeScreen()));
         } else {
           setState(() {
             isLoading = false;

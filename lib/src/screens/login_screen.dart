@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notesjot_app/src/screens/home_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
-import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -60,7 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('${responseValue['message']}')));
 
-          Navigator.of(context).pushReplacementNamed(homeRoute);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => const HomeScreen()));
         } else {
           setState(() {
             isLoading = false;

@@ -46,4 +46,23 @@ class ApiService {
       return json.decode(response.body);
     }
   }
+
+  Future<dynamic> deleteData(String endpoint, {String token = ''}) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8'
+    };
+
+    if (token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response =
+        await http.delete(Uri.parse('$apiBaseUrl/$endpoint'), headers: headers);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to delete data');
+    }
+  }
 }

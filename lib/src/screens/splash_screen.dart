@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notesjot_app/src/constants/route_names.dart';
+import 'package:notesjot_app/src/screens/home_screen.dart';
+import 'package:notesjot_app/src/screens/login_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,11 +20,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (tokenValue.isEmpty) {
       Future.delayed(Duration(seconds: 5), () {
-        Navigator.of(context).pushReplacementNamed(loginRoute);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const LoginScreen()));
       });
     } else {
       Future.delayed(Duration(seconds: 5), () {
-        Navigator.of(context).pushReplacementNamed(homeRoute);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const HomeScreen()));
       });
     }
   }

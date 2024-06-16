@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:notesjot_app/src/constants/route_names.dart';
 import 'package:notesjot_app/src/models/notes_model.dart';
 import 'package:notesjot_app/src/screens/create_note_screen.dart';
+import 'package:notesjot_app/src/screens/note_detail_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Map<String, dynamic> notesData =
         await ApiService().fetchData('notes/getAll', token: tokenValue);
+
+    print('response data getNotes ==>> $notesData');
 
     Note note = Note.fromJson(notesData);
 
@@ -65,12 +67,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: notes?.length,
                   itemBuilder: (context, index) {
                     final note = notes?[index];
+                    final noteId = note?.id;
+
                     final DateFormat formatter =
                         DateFormat('MMM d, y - h:mm a');
                     final formattedDate = formatter.format(note!.createdAt);
                     return InkWell(
                       onTap: () {
-                        print('tapped item: $note');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    NoteDetailScreen(
+                                      noteId: noteId,
+                                    )));
                       },
                       child: Container(
                         width: double.infinity,
