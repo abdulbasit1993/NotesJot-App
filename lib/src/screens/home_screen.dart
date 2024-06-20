@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notesjot_app/src/models/notes_model.dart';
 import 'package:notesjot_app/src/screens/create_note_screen.dart';
+import 'package:notesjot_app/src/screens/login_screen.dart';
 import 'package:notesjot_app/src/screens/note_detail_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
@@ -43,15 +44,29 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _handleLogout() async {
+    StorageService().deleteAllFromLocal();
+
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => const LoginScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Center(
-              child: Text(
-        'Home',
-        style: TextStyle(color: Colors.white),
-      ))),
+        title: Text(
+          'Home',
+          style: TextStyle(color: Colors.white),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.logout),
+          color: Colors.white,
+          onPressed: _handleLogout,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
         child: FutureBuilder<List<Datum>>(

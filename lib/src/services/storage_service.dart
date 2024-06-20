@@ -10,4 +10,8 @@ class StorageService {
   Future<String> getFromLocal(String key) async {
     return await secureStorage.read(key: key) ?? "";
   }
+
+  Future<void> deleteAllFromLocal() async {
+    await secureStorage.deleteAll();
+  }
 }
