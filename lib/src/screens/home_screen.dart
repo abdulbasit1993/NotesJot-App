@@ -64,7 +64,47 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: IconButton(
           icon: Icon(Icons.logout),
           color: Colors.white,
-          onPressed: _handleLogout,
+          onPressed: () {
+            showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  return SimpleDialog(
+                    title: const Center(
+                        child: Text('Logout',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold))),
+                    children: [
+                      const Center(
+                          child: Text('Are you sure you want to logout?',
+                              style: TextStyle(fontSize: 19))),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                      Color(0xff597cff))),
+                              onPressed: () {
+                                _handleLogout();
+                              },
+                              child: const Text('Yes',
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white))),
+                          SizedBox(width: 15),
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('No',
+                                  style: TextStyle(fontSize: 18)))
+                        ],
+                      )
+                    ],
+                  );
+                });
+          },
         ),
       ),
       body: Padding(
@@ -86,7 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     final DateFormat formatter =
                         DateFormat('MMM d, y - h:mm a');
+
                     final formattedDate = formatter.format(note!.createdAt);
+
                     return InkWell(
                       onTap: () {
                         Navigator.push(
@@ -99,7 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Container(
                         width: double.infinity,
-                        height: 100,
                         margin:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         decoration: BoxDecoration(
@@ -115,7 +156,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -102,24 +102,44 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         onPressed: () {
                           showDialog(
                               context: context,
+                              barrierDismissible: false,
                               builder: (BuildContext context) {
                                 return SimpleDialog(
-                                  title: const Text('Delete Note'),
+                                  title: const Center(
+                                      child: Text('Delete Note',
+                                          style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold))),
                                   children: [
-                                    const Text(
-                                        'Are you sure you want to delete this note?'),
+                                    Center(
+                                      child: const Text(
+                                          'Are you sure you want to delete this note?',
+                                          style: TextStyle(fontSize: 15)),
+                                    ),
+                                    SizedBox(height: 10),
                                     Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    WidgetStateProperty.all(
+                                                        Color(0xff597cff))),
                                             onPressed: () {
                                               onDeletePress();
                                             },
-                                            child: const Text('Yes')),
+                                            child: const Text('Yes',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.white))),
+                                        SizedBox(width: 15),
                                         ElevatedButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: const Text('No'))
+                                            child: const Text('No',
+                                                style: TextStyle(fontSize: 18)))
                                       ],
                                     )
                                   ],
