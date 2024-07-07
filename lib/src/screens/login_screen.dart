@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notesjot_app/src/screens/home_screen.dart';
+import 'package:notesjot_app/src/screens/signup_screen.dart';
 import 'package:notesjot_app/src/services/storage_service.dart';
 import 'package:notesjot_app/src/services/api_service.dart';
 
@@ -189,7 +190,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                 ),
-              )
+              ),
+              SizedBox(
+                height: 60,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Don't have an account? ",
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  const SignupScreen()));
+                    },
+                    child: Text(
+                      'Signup',
+                      style: TextStyle(color: Colors.blue, fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
